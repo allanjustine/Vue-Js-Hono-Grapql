@@ -3,7 +3,7 @@ import ModalItem from "../ModalItem.vue";
 import ModalFooter from "../ModalFooter.vue";
 import ModalHeader from "../ModalHeader.vue";
 import ModalBody from "../ModalBody.vue";
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, onUnmounted, reactive, ref } from "vue";
 import Swal from "sweetalert2";
 
 const buttonRef = ref<HTMLButtonElement | null>(null);
@@ -21,6 +21,7 @@ const formState = reactive({
 });
 const isLoading = ref(false);
 const isLoadingDelete = ref<{ [key: number]: boolean }>({});
+const socket: WebSocket | null = null;
 
 const users = reactive([
   {
@@ -53,20 +54,33 @@ function toggleModal() {
   open.value = !open.value;
 }
 
-onMounted(() => {
-  function handleClickOutside(event: MouseEvent) {
-    if (
-      modalRef?.value &&
-      modalRef.value.modalRefItem &&
-      !modalRef.value.modalRefItem.contains(event.target as Node) &&
-      buttonRef.value &&
-      !buttonRef.value.contains(event.target as Node)
-    ) {
-      open.value = false;
-    }
+function handleClickOutside(event: MouseEvent) {
+  if (
+    modalRef?.value &&
+    modalRef.value.modalRefItem &&
+    !modalRef.value.modalRefItem.contains(event.target as Node) &&
+    buttonRef.value &&
+    !buttonRef.value.contains(event.target as Node)
+  ) {
+    open.value = false;
   }
+}
 
+onMounted(() => {
   document.addEventListener("click", handleClickOutside);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      open.value = false;
+      openEdit.value = false;
+      formState.name = "";
+      formState.email = "";
+      formState.id = 0;
+    }
+  });
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside);
 });
 
 function handleSubmit() {
@@ -214,10 +228,9 @@ function handleUpdate() {
   }
 }
 </script>
-
 <template>
   <div class="flex justify-center">
-    <div class="mt-10 flex flex-col items-center">
+    <div class="mt-10 flex flex-col items-center w-4xl">
       <button
         class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 self-end"
         type="button"
@@ -226,7 +239,7 @@ function handleUpdate() {
       >
         Add User
       </button>
-      <table class="border-collapse border border-gray-400 mt-2">
+      <table class="border-collapse border border-gray-400 mt-2 w-full">
         <thead class="bg-gray-200">
           <tr>
             <th class="border border-gray-300 p-3">ID</th>
