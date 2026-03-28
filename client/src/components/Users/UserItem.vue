@@ -159,9 +159,7 @@ function Error({ state }: { state: typeof formState }) {
 function handleDelete(id: number) {
   isLoadingDelete.value = {
     ...isLoadingDelete.value,
-    ...{
-      [id]: true,
-    },
+    [id]: true,
   };
   setTimeout(() => {
     users.splice(
@@ -178,9 +176,7 @@ function handleDelete(id: number) {
     });
     isLoadingDelete.value = {
       ...isLoadingDelete.value,
-      ...{
-        [id]: false,
-      },
+      [id]: false,
     };
   }, 3000);
 }
