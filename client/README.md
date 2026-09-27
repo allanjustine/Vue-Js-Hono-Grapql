@@ -47,4 +47,4 @@ bun run build
 bun lint
 ```
 
-client updates?
+client updates? .
